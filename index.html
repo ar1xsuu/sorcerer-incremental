@@ -2,28 +2,101 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sorcerer Incremental Simulator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07040c">
+<title>Jujutsu Incremental</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,700;1,700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light dark}
-body{font:15px system-ui,sans-serif;max-width:720px;margin:0 auto;padding:10px;background:Canvas;color:CanvasText}
-button{font:inherit;padding:6px 10px;margin:2px;cursor:pointer}
-.card{border:1px solid GrayText;border-radius:8px;padding:8px;margin:6px 0}
-progress{width:100%;height:14px;display:block}
-#bar{position:relative;height:22px;border:1px solid GrayText;margin:6px 0}
-#zone{position:absolute;left:38%;width:24%;height:100%;background:Highlight;opacity:.4}
-#mk{position:absolute;top:0;width:4px;height:100%;background:CanvasText}
-nav button.on{font-weight:700;text-decoration:underline}
-.r0{color:GrayText}.r1{color:#2a7de1}.r2{color:#9b51e0}.r3{color:#d89a1c}.r4{color:#e03a3a}
-small{opacity:.75}
+:root{color-scheme:dark;--bg:#07040c;--pn:#130a1f;--rd:#e5142b;--pu:#8a3dff;--tx:#efeaf8;--mu:#a094bd;--ln:#33205a;--gr:linear-gradient(135deg,#e5142b,#8a3dff)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font:500 15px/1.4 'Chakra Petch',system-ui,sans-serif}
+body{background:radial-gradient(120% 50% at 50% 0,#2b0e48,transparent) no-repeat,var(--bg)}
+button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#app{max-width:560px;height:100vh;height:100dvh;margin:0 auto;display:flex;flex-direction:column;position:relative}
+#hud{display:flex;gap:6px;align-items:center;padding:calc(8px + env(safe-area-inset-top)) 10px 8px;border-bottom:1px solid var(--ln);background:#0b0614}
+#main{flex:1;min-height:0;overflow-y:auto;padding:10px 10px 28px}
+.gb{margin-right:auto;font-weight:700;font-style:italic;padding:3px 14px;background:var(--gr);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.chip{background:var(--pn);border:1px solid var(--ln);padding:2px 9px;border-radius:99px;white-space:nowrap}
+.chip b{color:#fff}
+h1,h2{font-style:italic;letter-spacing:.05em;text-transform:uppercase}
+h2{margin:6px 2px 8px;font-size:17px}
+.card{background:linear-gradient(160deg,var(--pn),#0d0716);border:1px solid var(--ln);border-left:3px solid var(--rd);border-radius:6px;padding:10px;margin:0 0 10px}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.row+.row{margin-top:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(64px,1fr));gap:6px;text-align:center;margin-top:8px}
+.grid div{background:#0006;border-radius:6px;padding:4px}
+.grid small,.grid b{display:block}
+small,.mu{color:var(--mu);font-size:12.5px}
+.btn{font:inherit;font-weight:700;color:#fff;border:0;padding:9px 18px;background:var(--gr);cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:transform .1s,filter .2s}
+.btn small{color:#ffe;opacity:.85}
+.btn:active{transform:scale(.95)}
+.btn.gh{background:#2a1850}
+.btn.s{clip-path:none;border-radius:6px;text-align:left;width:100%}
+.btn:disabled{filter:grayscale(1) brightness(.5);cursor:default}
+.bar{height:9px;background:#000;border:1px solid var(--ln);border-radius:9px;overflow:hidden;margin:5px 0}
+.bar i{display:block;height:100%;background:var(--gr);transition:width .3s}
+.bar.hp i{background:linear-gradient(90deg,#8d0f1f,#ff3b4f)}
+.bar.ce i{background:linear-gradient(90deg,#5a22b8,#b07bff)}
+.tag{font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px;border:1px solid currentColor}
+.r0{color:#a5a0b5}.r1{color:#4aa3ff}.r2{color:#b57bff}.r3{color:#ffc04a}.r4{color:#ff3b5c}
+.ban{position:relative;height:150px;margin-bottom:10px;border:1px solid var(--ln);border-radius:6px;overflow:hidden;background:var(--gr)}
+.ban>img{width:100%;height:100%;object-fit:cover;display:block}
+.ov{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(transparent 35%,#07040ce6)}
+.mini{height:68px;max-width:90%;object-fit:contain;mix-blend-mode:screen}
+.tb{display:block;width:100%;padding:18px;font-size:22px;text-align:center}
+#bar{position:relative;height:26px;background:#000;border:1px solid var(--ln);border-radius:4px;margin:10px 0;overflow:hidden}
+#zone{position:absolute;left:38%;width:24%;height:100%;background:#8a3dff73}
+#zone:after{content:"";position:absolute;left:37.5%;width:25%;height:100%;background:#e5142bb3}
+#mk{position:absolute;top:0;width:4px;height:100%;background:#fff;box-shadow:0 0 8px #fff}
+.foe{text-align:center}
+.aura{width:96px;height:96px;margin:4px auto 8px;border-radius:50%;display:grid;place-items:center;font-size:44px;background:radial-gradient(circle,#000 38%,#4b1a96 62%,transparent 74%);box-shadow:0 0 30px var(--pu);animation:pulse 2.2s infinite}
+.aura.boss{box-shadow:0 0 36px var(--rd);background:radial-gradient(circle,#000 38%,#8d0f1f 62%,transparent 74%)}
+.hit .aura{animation:shake .3s}
+.phit{animation:flash .4s}
+.sk{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.orb{width:130px;height:130px;margin:6px auto 12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff6a7e,#8a3dff 55%,#1a0a33);box-shadow:0 0 40px var(--pu);animation:pulse 2.4s infinite}
+.res{border:2px solid currentColor;box-shadow:0 0 24px currentColor;text-align:center;animation:pop .7s cubic-bezier(.2,1.5,.4,1)}
+#toast{position:absolute;left:50%;bottom:96px;transform:translate(-50%,16px);max-width:92%;background:#1b0b33f2;border:1px solid var(--pu);padding:8px 14px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none;z-index:15;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#nav{position:relative;z-index:20;display:flex;align-items:flex-end;justify-content:space-around;background:#0b0614;border-top:1px solid var(--ln);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+#nav button{background:none;border:0;color:var(--mu);font:inherit;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:2px;width:20%;cursor:pointer}
+#nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#nav button.on{color:#fff}
+#nav button.on svg{stroke:#ff3b5c;filter:drop-shadow(0 0 5px var(--rd))}
+#nav #crest{width:62px;height:62px;margin-top:-30px;justify-content:center;border-radius:50%;background:radial-gradient(circle,#2a1050,#0b0614);border:2px solid var(--pu);color:#fff;box-shadow:0 0 14px var(--pu);transition:transform .4s,box-shadow .3s,border-color .3s}
+#nav #crest svg{width:36px;height:36px}
+#nav #crest.on{border-color:var(--rd)}
+#nav #crest.open{transform:rotate(180deg);border-color:var(--rd);box-shadow:0 0 24px var(--rd)}
+#fan{position:absolute;left:50%;bottom:calc(37px + env(safe-area-inset-bottom));width:0;height:0}
+#fan button{position:absolute;left:-28px;top:-28px;width:56px;height:56px;justify-content:center;border-radius:50%;background:radial-gradient(circle,#3a1670,#14082a);border:1px solid var(--pu);color:#fff;font-size:9.5px;opacity:0;pointer-events:none;transform:scale(.2);transition:transform .35s cubic-bezier(.3,1.6,.5,1) calc(var(--i)*.05s),opacity .2s;box-shadow:0 0 12px #8a3dff88}
+#fan svg{width:20px;height:20px}
+#fan.open button{opacity:1;pointer-events:auto;transform:translate(var(--x),var(--y))}
+#title{position:fixed;inset:0;z-index:99;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;background:#000;transition:opacity .6s,transform .6s}
+#title.out{opacity:0;transform:scale(1.15);pointer-events:none}
+.tbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35;box-shadow:inset 0 0 160px 70px #000}
+#title .lg{position:relative;z-index:1;width:min(94vw,720px);mix-blend-mode:screen;animation:glow 3s ease-in-out infinite}
+#title .btn{position:relative;z-index:1;font-size:18px;padding:12px 48px;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{transform:scale(1.06);filter:brightness(1.3)}}
+@keyframes glow{50%{filter:drop-shadow(0 0 20px #e5142b) drop-shadow(0 0 36px #8a3dff)}}
+@keyframes pop{0%{transform:scale(.3) rotate(-8deg);opacity:0;filter:blur(8px)}}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes flash{0%{box-shadow:inset 0 0 40px var(--rd)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<h3>Sorcerer Incremental Simulator</h3>
-<div id="hud" class="card"></div>
-<nav><button data-t="train">Train</button><button data-t="missions">Missions</button><button data-t="tech">Techniques</button><button data-t="prog">Progress</button></nav>
-<div id="main"></div>
-<div id="log" class="card"></div>
+<div id="app">
+<header id="hud"></header>
+<main id="main"></main>
+<div id="toast"></div>
+<nav id="nav"></nav>
+</div>
+<div id="title">
+<img class="tbg" src="https://media1.tenor.com/m/I-taHgOa4oMAAAAC/specialz-jjk-s2-opening.gif" alt="" referrerpolicy="no-referrer" onerror="this.remove()">
+<img class="lg" src="logo.png" alt="Jujutsu Incremental" onerror="this.outerHTML='<h1 class=lg>Jujutsu Incremental</h1>'">
+<button class="btn" id="go">Begin</button>
+</div>
 <script>
 /* ===== DATA ===== */
 const GR=['Grade 4','Grade 3','Grade 2','Grade 1','Special Grade'],RA=['Common','Rare','Epic','Legendary','Mythical'];
@@ -41,7 +114,7 @@ const AC=[['a1','First Steps','Earn 100 TP',s=>s.rec.tp>=100],['a2','First Exorc
 const fresh=()=>({tp:0,yen:0,core:3,g:0,s:{ce:1,str:1,dur:1,spd:1,tech:1},u:{c:0,a:0,y:0},tq:{},eq:[],gear:{},rec:{kills:0,boss:0,tp:0,combo:0,cal:0},ach:{},t:Date.now()});
 function load(){try{const d=JSON.parse(localStorage.getItem(SAVE));return d?{...fresh(),...d}:fresh()}catch(e){return fresh()}}
 function save(){S.t=Date.now();try{localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}}
-let S=load(),C=null,tab='train',last='',combo=0,L=[];
+let S=load(),C=null,tab='home',last='',combo=0,L=[],TS=0,RL=null;
 
 /* ===== HELPERS / DERIVED STATS ===== */
 const $=id=>document.getElementById(id),f=n=>n>=1e9?n.toExponential(2):n>=100?Math.floor(n).toLocaleString():String(Math.floor(n*10)/10);
@@ -51,7 +124,7 @@ const atk=()=>(3+2*S.s.str+1.5*S.s.ce)*(1+S.s.tech*.03)*(1+gb('w')/100);
 const click=()=>(1+S.u.c)*mult()*(1+gb('c')/100),auto=()=>S.u.a*.5*mult()*(1+gb('c')/100);
 const cost=l=>Math.ceil(4*l**1.3),ucost=u=>Math.ceil(u[3]*u[4]**S.u[u[0]]);
 const pos=()=>{const t=(Date.now()%1600)/800;return t<1?t:2-t};
-const lg=m=>{L.unshift(m);L=L.slice(0,7)};
+const lg=m=>{L.unshift(m);L=L.slice(0,7);TS=Date.now()};
 const addTp=n=>{S.tp+=n;S.rec.tp+=n};
 const roll=()=>{let x=Math.random()*100,r=0;WT.some((w,i)=>(r=i,(x-=w)<0));return r};
 
@@ -65,7 +138,7 @@ function focus(){const d=Math.abs(pos()-.5);let m=1,w='Miss';
 function awaken(){if(S.core<3)return;S.core-=3;
  const r=Math.min(roll(),S.g+1),pool=TQ.map((_,i)=>i).filter(i=>TQ[i][1]==r),i=pool[Math.random()*pool.length|0];
  S.tq[i]=(S.tq[i]||0)+1;if(S.tq[i]==1&&S.eq.length<3)S.eq.push(i);
- lg(`Awakened ${TQ[i][0]} (${RA[r]})${S.tq[i]>1?', now Lv'+S.tq[i]:''}!`)}
+ RL={i,r,n:S.tq[i]};lg(`Awakened ${TQ[i][0]} (${RA[r]})${S.tq[i]>1?', now Lv'+S.tq[i]:''}!`)}
 function drop(mg){const r=Math.min(roll(),mg),s='wac'[Math.random()*3|0],b=Math.round((5+Math.random()*5)*(r+1)),c=S.gear[s],n=`${RA[r]} ${SL[s]} (+${b}% ${SD[s]})`;
  if(!c||b>c.b){S.gear[s]={r,b};return n+' equipped'}
  const y=Math.round(b*2*3**mg);S.yen+=y;return n+` scrapped for ${y}¥`}
@@ -75,14 +148,14 @@ const skills=()=>[{id:'st',n:'Strike',c:0,m:.8,cd:0,t:''},{id:'bl',n:'CE Blast',
 function foe(g,boss,x=1){const m=3**g;return{n:(boss?'★ ':'')+EN[g][boss?1:0],g,hp:Math.round(40*m*(boss?3.5:1)*x),atk:6*m*(boss?1.6:1)*(1+(x-1)/2)}}
 function start(kind,g,boss,x){const e=foe(g,boss,x);e.mhp=e.hp;C={e,kind,mg:g,hp:maxHp(),ce:maxCe(),cd:{},stun:0,guard:0,over:0,res:'',place:PL[Math.random()*5|0]};L=[];lg(`${e.n} appears! (${C.place})`)}
 function act(id){const s=skills().find(x=>x.id===id);if(!s||C.over||C.ce<s.c||C.cd[id]>0)return;
- C.ce-=s.c;C.cd[id]=s.cd+1;
+ C.ce-=s.c;C.cd[id]=s.cd+1;C.fx='';
  if(s.t=='guard'){C.guard=1;C.ce=Math.min(maxCe(),C.ce+10);lg('You brace and recover cursed energy.')}
  else if(s.t=='heal'){const h=Math.round(maxHp()*.35);C.hp=Math.min(maxHp(),C.hp+h);lg(`${s.n}: healed ${h}.`)}
- else{const d=Math.round(atk()*s.m*(.9+Math.random()*.2));C.e.hp-=d;lg(`${s.n} hits for ${f(d)}.`);if(s.t=='stun'&&Math.random()<.6){C.stun=1;lg('The enemy is bound!')}}
+ else{const d=Math.round(atk()*s.m*(.9+Math.random()*.2));C.e.hp-=d;C.fx+='e';lg(`${s.n} hits for ${f(d)}.`);if(s.t=='stun'&&Math.random()<.6){C.stun=1;lg('The enemy is bound!')}}
  if(C.e.hp<=0)return end(1);
  if(C.stun){C.stun--;lg('The enemy is stunned and loses its turn.')}
  else if(Math.random()<Math.min(.4,S.s.spd*.005))lg('You dodged!');
- else{let d=Math.round(C.e.atk*(.8+Math.random()*.4));if(C.guard)d=Math.round(d/2);C.hp-=d;lg(`${C.e.n} hits you for ${f(d)}.`)}
+ else{let d=Math.round(C.e.atk*(.8+Math.random()*.4));if(C.guard)d=Math.round(d/2);C.hp-=d;C.fx+='p';lg(`${C.e.n} hits you for ${f(d)}.`)}
  C.guard=0;
  if(C.hp<=0)return end(0);
  for(const k in C.cd)C.cd[k]=Math.max(0,C.cd[k]-1);
@@ -98,49 +171,86 @@ function end(w){C.over=1;
  if(k=='cal')r.cal++;
  lg(msg)}
 
-/* ===== VIEWS ===== */
-function fight(){const e=C.e,mh=maxHp();
- let h=`<div class="card"><b>${e.n}</b> <small>${GR[e.g]} · ${C.place}</small><progress value="${Math.max(0,e.hp)}" max="${e.mhp}"></progress>${f(Math.max(0,e.hp))} / ${f(e.mhp)} HP</div>
-<div class="card">You: ${f(Math.max(0,C.hp))} / ${mh} HP<progress value="${Math.max(0,C.hp)}" max="${mh}"></progress>${Math.floor(C.ce)} / ${maxCe()} CE<progress value="${C.ce}" max="${maxCe()}"></progress></div><div class="card">`;
- skills().forEach(s=>{const w=C.cd[s.id]||0;h+=`<button data-a="act" data-k="${s.id}" ${C.over||C.ce<s.c||w?'disabled':''}>${s.n}<br><small>${s.t=='guard'?'halve next hit, +10 CE':s.t=='heal'?s.c+' CE, heal 35%':s.c?s.c+' CE':'free'}${s.cd?' · cd '+s.cd:''}${w?' · wait '+w:''}</small></button>`});
- return h+(C.over?`<p><b>${C.res}</b></p><button data-a="back">Continue</button>`:'<p><button data-a="back">Flee</button></p>')+'</div>'}
+/* ===== UI ===== */
+const GIF='https://media1.tenor.com/m/I-taHgOa4oMAAAAC/specialz-jjk-s2-opening.gif';
+const IC={home:'M3 11l9-8 9 8v10h-6v-6H9v6H3z',train:'M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-10z',battle:'M4 4l12 12M20 4L8 16M3 21l5-5M21 21l-5-5',roll:'M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z',inv:'M6 8h12l1 13H5zM9 8a3 3 0 0 1 6 0',profile:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c1-6 15-6 16 0',index:'M5 3h11a3 3 0 0 1 3 3v15H8a3 3 0 0 1-3-3zM5 18a3 3 0 0 1 3-3h11',settings:'M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6'};
+const ic=k=>`<svg viewBox="0 0 24 24"><path d="${IC[k]}"/></svg>`;
+const NAV=['home','train','crest','battle','roll'],MENU=[['inv','Inventory',155],['profile','Profile',115],['index','Index',65],['settings','Settings',25]];
+const EF={ce:'max CE and regen',str:'damage',dur:'max HP',spd:'dodge chance',tech:'skill damage'},SN={ce:'CE',str:'STR',dur:'DUR',spd:'SPD',tech:'TECH'};
+const bar=(v,m,c='')=>`<div class="bar ${c}"><i style="width:${Math.max(0,Math.min(100,v/m*100))}%"></i></div>`;
+function buildNav(){
+ $('nav').innerHTML=NAV.map(k=>k=='crest'?'<button id="crest" aria-label="Menu"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 5l3.5 7-3.5 7-3.5-7zM5 12h14"/></svg></button>':`<button data-t="${k}">${ic(k)}<span>${k[0].toUpperCase()+k.slice(1)}</span></button>`).join('')
+ +`<div id="fan">${MENU.map(([k,n,a],i)=>`<button data-t="${k}" style="--x:${Math.round(Math.cos(a*Math.PI/180)*92)}px;--y:${-Math.round(Math.sin(a*Math.PI/180)*92)}px;--i:${i}">${ic(k)}<span>${n}</span></button>`).join('')}</div>`}
+
+function fight(){const e=C.e,mh=maxHp(),mc=maxCe(),fx=C.fx||'';
+ let h=`<div class="card foe${fx.includes('e')?' hit':''}"><div class="aura${e.n[0]=='★'?' boss':''}"><span>呪</span></div><b>${e.n}</b> <span class="tag r${e.g}">${GR[e.g]}</span><br><small>${C.place}</small>${bar(e.hp,e.mhp,'hp')}<small>${f(Math.max(0,e.hp))} / ${f(e.mhp)} HP</small></div>
+<div class="card${fx.includes('p')?' phit':''}"><div class="row"><b>You</b><small>${f(Math.max(0,C.hp))}/${mh} HP · ${Math.floor(C.ce)}/${mc} CE</small></div>${bar(C.hp,mh,'hp')}${bar(C.ce,mc,'ce')}</div><div class="sk">`;
+ skills().forEach(s=>{const w=C.cd[s.id]||0;h+=`<button class="btn s" data-a="act" data-k="${s.id}" ${C.over||C.ce<s.c||w?'disabled':''}>${s.n}<br><small>${s.t=='guard'?'halve next hit, +10 CE':s.t=='heal'?s.c+' CE, heal 35%':s.c?s.c+' CE':'free'}${s.cd?' · cd '+s.cd:''}${w?' · wait '+w:''}</small></button>`});
+ h+=`</div><div class="card">${L.slice(0,5).join('<br>')}</div>`;
+ return h+(C.over?`<div class="card res ${C.res=='Victory'?'r3':'r4'}"><h2>${C.res}</h2><button class="btn" data-a="back">Continue</button></div>`:'<button class="btn gh" data-a="back">Flee</button>')}
+
 const V={
+home(){const nx=S.g<4?NEED[S.g]:T();
+ return `<div class="ban"><img src="${GIF}" alt="" referrerpolicy="no-referrer" onerror="this.remove()"><div class="ov"><img class="mini" src="logo.png" alt="Jujutsu Incremental" onerror="this.remove()"></div></div>
+<div class="card"><div class="row"><b class="r${S.g}">${GR[S.g]} Sorcerer</b><span class="tag r${S.g}">${RA[S.g]}</span></div>
+<small>${S.g<4?`Promotion exam at ${NEED[S.g]} total stats (you have ${T()})`:'Special Grade reached. Raid the Calamity.'}</small>${bar(T(),nx)}
+<div class="grid"><div><small>HP</small><b>${maxHp()}</b></div><div><small>CE</small><b>${maxCe()}</b></div><div><small>ATK</small><b>${f(atk())}</b></div><div><small>Idle</small><b>${f(auto())}/s</b></div></div></div>
+<div class="card"><div class="row"><button class="btn" data-t="train">Train</button><button class="btn" data-t="battle">Battle</button><button class="btn gh" data-t="roll">Roll</button></div></div>`},
 train(){
- let h=`<div class="card"><button data-a="train">Train (+${f(click())} TP)</button> <small>${f(auto())} TP/s idle</small>
+ let h=`<div class="card"><button class="btn tb" data-a="train">TRAIN<br><small>+${f(click())} TP per tap · ${f(auto())}/s idle</small></button>
 <div id="bar"><div id="zone"></div><div id="mk"></div></div>
-<button data-a="focus">Cursed Energy Control: press in the zone</button> <small>combo x${combo}</small></div>
-<div class="card"><b>Stats</b> <small>HP ${maxHp()} · CE ${maxCe()} · ATK ${f(atk())} · Dodge ${Math.min(40,S.s.spd*.5)}%</small><br><small>Total ${T()} / ${S.g<4?NEED[S.g]+' for the promotion exam':'max grade'}</small>`;
- ST.forEach(([k,n])=>{const c=cost(S.s[k]);h+=`<div>${n}: <b>${S.s[k]}</b> <button data-a="stat" data-k="${k}" ${S.tp<c?'disabled':''}>+1 (${f(c)} TP)</button></div>`});
- h+='</div><div class="card"><b>Upgrades</b> <small>(paid in yen from missions)</small>';
- UP.forEach(u=>{const c=ucost(u);h+=`<div>${u[1]} Lv ${S.u[u[0]]} · ${u[2]} <button data-a="up" data-k="${u[0]}" ${S.yen<c?'disabled':''}>${f(c)}¥</button></div>`});
+<div class="row"><button class="btn gh" data-a="focus">Control cursed energy</button><small>combo x${combo}</small></div><small>Press when the line is in the purple zone. Red centre is perfect.</small></div>
+<h2>Stats</h2><div class="card"><small>Total ${T()} / ${S.g<4?NEED[S.g]+' for the promotion exam':'max grade'} · Dodge ${Math.min(40,S.s.spd*.5)}%</small>`;
+ ST.forEach(([k,n])=>{const c=cost(S.s[k]);h+=`<div class="row"><div><b>${n}</b> <span class="mu">Lv ${S.s[k]}</span><br><small>${EF[k]}</small></div><button class="btn" data-a="stat" data-k="${k}" ${S.tp<c?'disabled':''}>+1 · ${f(c)} TP</button></div>`});
+ h+='</div><h2>Upgrades</h2><div class="card">';
+ UP.forEach(u=>{const c=ucost(u);h+=`<div class="row"><div><b>${u[1]}</b> <span class="mu">Lv ${S.u[u[0]]}</span><br><small>${u[2]}</small></div><button class="btn" data-a="up" data-k="${u[0]}" ${S.yen<c?'disabled':''}>${f(c)}¥</button></div>`});
  return h+'</div>'},
-missions(){if(C)return fight();
- let h='<div class="card"><b>Missions</b> <small>exorcise spirits for TP, yen, cores and gear</small><br>';
- for(let i=0;i<=S.g;i++)h+=`<button data-a="go" data-i="${i}">${GR[i]} spirit<br><small>x${3**i} rewards</small></button>`;
- h+='</div><div class="card"><b>Boss battles</b><br>';
- h+=S.g<4?`<button data-a="exam" ${T()<NEED[S.g]?'disabled':''}>Promotion Exam: ${GR[S.g+1]}<br><small>needs ${NEED[S.g]} total stats</small></button>`:`<button data-a="cal">Calamity Raid<br><small>Special Grade threat · cleared ${S.rec.cal}</small></button>`;
+battle(){if(C)return fight();
+ let h='<h2>Missions</h2>';
+ for(let i=0;i<=S.g;i++)h+=`<div class="card row"><div><b class="r${i}">${GR[i]} spirit</b><br><small>x${3**i} rewards · drops ${RA[i]} gear</small></div><button class="btn" data-a="go" data-i="${i}">Fight</button></div>`;
+ h+='<h2>Boss battles</h2>';
+ return h+(S.g<4?`<div class="card row"><div><b>Promotion Exam</b> <span class="tag r${S.g+1}">${GR[S.g+1]}</span><br><small>Needs ${NEED[S.g]} total stats (you have ${T()})</small></div><button class="btn" data-a="exam" ${T()<NEED[S.g]?'disabled':''}>Challenge</button></div>`:`<div class="card row"><div><b>Calamity Raid</b> <span class="tag r4">Special Grade</span><br><small>Cleared ${S.rec.cal} · stronger every clear</small></div><button class="btn" data-a="cal">Challenge</button></div>`)},
+roll(){
+ return `<h2>Awaken</h2><div class="card" style="text-align:center"><div class="orb"></div><button class="btn" data-a="awaken" ${S.core>=3?'':'disabled'}>Awaken technique · 3 cores</button><br><small>You have ${S.core} cores. Duplicates level a technique up. Your grade caps the rarity you can reach (${RA[Math.min(4,S.g+1)]}).</small></div>`
+ +(RL?`<div class="card res r${RL.r}"><span class="tag">${RA[RL.r]}</span><h2>${TQ[RL.i][0]}</h2><small>${RL.n>1?'Duplicate! Now Lv '+RL.n:'New technique!'} · ${TQ[RL.i][2]} CE · x${TQ[RL.i][3]} · cd ${TQ[RL.i][4]}</small></div>`:'')
+ +`<div class="card"><b>Odds</b><br>${RA.map((n,i)=>`<span class="tag r${i}">${n} ${WT[i]}%</span>`).join(' ')}</div>`},
+inv(){
+ let h=`<h2>Techniques</h2><small>${S.eq.length}/3 equipped</small>`;
+ const own=Object.keys(S.tq);if(!own.length)h+='<div class="card"><small>None yet. Awaken one in the Roll tab.</small></div>';
+ own.forEach(i=>{const t=TQ[i],on=S.eq.includes(+i);h+=`<div class="card row r${t[1]}" style="border-left-color:currentColor"><div><b>${t[0]}</b> <span class="tag">${RA[t[1]]}</span><br><small>Lv ${S.tq[i]} · ${t[2]} CE · x${(t[3]*(1+.15*(S.tq[i]-1))).toFixed(1)} · cd ${t[4]}${t[5]?' · '+t[5]:''}</small></div><button class="btn${on?' gh':''}" data-a="eq" data-k="${i}">${on?'Unequip':'Equip'}</button></div>`});
+ h+='<h2>Equipment</h2>';
+ for(const s in SL){const g=S.gear[s];h+=`<div class="card row"><b>${SL[s]}</b>${g?`<span class="r${g.r}">${RA[g.r]} · +${g.b}% ${SD[s]}</span>`:'<small>empty</small>'}</div>`}
+ return h+'<small>Gear drops from missions and bosses. The best piece per slot equips automatically.</small>'},
+profile(){const r=S.rec;
+ let h=`<h2>Profile</h2><div class="card"><div class="row"><b class="r${S.g}">${GR[S.g]} Sorcerer</b><span class="tag r${S.g}">${RA[S.g]}</span></div><div class="grid">${ST.map(([k])=>`<div><small>${SN[k]}</small><b>${S.s[k]}</b></div>`).join('')}</div></div>
+<div class="card"><b>Records</b>${[['Highest grade',GR[S.g]],['Total stats',T()],['Total TP earned',f(r.tp)],['Spirits exorcised',r.kills],['Bosses defeated',r.boss],['Calamity raids cleared',r.cal],['Best focus combo',r.combo]].map(x=>`<div class="row"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('')}</div>
+<h2>Achievements ${Object.keys(S.ach).length}/${AC.length}</h2><div class="card">`;
+ AC.forEach(a=>h+=`<div class="row"><span>${S.ach[a[0]]?'✅':'⬜'} ${a[1]}</span><small>${a[2]}</small></div>`);
  return h+'</div>'},
-tech(){
- let h=`<div class="card"><button data-a="awaken" ${S.core<3?'disabled':''}>Awaken technique (3 cores)</button><br><small>Cores: ${S.core} · duplicates level a technique up (+15% damage) · equip up to 3 · higher grades unlock rarer techniques</small></div><div class="card"><b>Techniques</b> <small>(${S.eq.length}/3 equipped)</small>`;
- const own=Object.keys(S.tq);if(!own.length)h+='<div><small>None yet. Awaken one.</small></div>';
- own.forEach(i=>{const t=TQ[i],on=S.eq.includes(+i);h+=`<div class="r${t[1]}"><b>${t[0]}</b> ${RA[t[1]]} Lv${S.tq[i]} <small>${t[2]} CE · x${(t[3]*(1+.15*(S.tq[i]-1))).toFixed(1)} · cd ${t[4]}${t[5]?' · '+t[5]:''}</small> <button data-a="eq" data-k="${i}">${on?'Unequip':'Equip'}</button></div>`});
+index(){
+ let h='<h2>Index</h2><div class="card"><b>Grades</b>';
+ GR.forEach((g,i)=>h+=`<div class="row"><span class="r${i}"><b>${g}</b> · ${RA[i]}</span><small>${i?'exam at '+NEED[i-1]+' stats':'starting grade'}</small></div>`);
+ h+=`</div><div class="card"><b>Techniques ${Object.keys(S.tq).length}/${TQ.length}</b>`;
+ TQ.forEach((t,i)=>{const o=S.tq[i];h+=`<div class="row r${t[1]}"><span>${o?t[0]:'???'}</span><small>${RA[t[1]]}${o?' · Lv '+o:''}</small></div>`});
  return h+'</div>'},
-prog(){
- let h='<div class="card"><b>Equipment</b> <small>(best drop per slot is equipped automatically)</small>';
- for(const s in SL){const g=S.gear[s];h+=`<div>${SL[s]}: ${g?`<span class="r${g.r}">${RA[g.r]} +${g.b}% ${SD[s]}</span>`:'<small>empty</small>'}</div>`}
- h+=`</div><div class="card"><b>Records</b><div>Highest grade: ${GR[S.g]} · Total stats: ${T()} · Total TP: ${f(S.rec.tp)}</div><div>Spirits exorcised: ${S.rec.kills} · Bosses: ${S.rec.boss} · Best combo: ${S.rec.combo}</div></div><div class="card"><b>Achievements</b> <small>(+1 core each)</small>`;
- AC.forEach(a=>h+=`<div>${S.ach[a[0]]?'✅':'⬜'} ${a[1]} <small>${a[2]}</small></div>`);
- return h+'</div><div class="card"><button data-a="save">Save now</button><button data-a="reset">Reset progress</button></div>'}
+settings(){
+ return `<h2>Settings</h2><div class="card"><b>Save</b><br><small>Autosaves every 10 seconds in this browser.</small><div class="row"><button class="btn" data-a="save">Save now</button><button class="btn gh" data-a="export">Copy save</button><button class="btn gh" data-a="import">Load save</button></div></div><div class="card"><b>Danger zone</b><div class="row"><button class="btn gh" data-a="reset">Reset progress</button></div></div>`}
 };
+
 function render(){
- $('hud').innerHTML=`<b>${GR[S.g]}</b> <span class="r${S.g}">${RA[S.g]}</span> · TP <b>${f(S.tp)}</b> · ¥ <b>${f(S.yen)}</b> · Cores <b>${S.core}</b> · Total stats <b>${T()}</b>`;
- const h=V[tab]();if(h!==last){last=h;$('main').innerHTML=h}
- $('log').innerHTML=L.length?L.join('<br>'):'<small>Your journey begins. Train, then take a mission.</small>';
- document.querySelectorAll('nav button').forEach(b=>b.className=b.dataset.t==tab?'on':'')}
+ $('hud').innerHTML=`<span class="gb">${GR[S.g]}</span><span class="chip">TP <b>${f(S.tp)}</b></span><span class="chip">¥ <b>${f(S.yen)}</b></span><span class="chip">◈ <b>${S.core}</b></span>`;
+ const h=V[tab](),m=$('main');if(h!==last){last=h;const sc=m.scrollTop;m.innerHTML=h;m.scrollTop=sc}
+ const t=$('toast');t.textContent=L[0]||'';t.classList.toggle('on',L.length>0&&tab!='battle'&&Date.now()-TS<3500);
+ document.querySelectorAll('#nav>button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));
+ $('crest').classList.toggle('on',MENU.some(x=>x[0]==tab))}
 
 /* ===== INPUT ===== */
-document.addEventListener('click',e=>{const b=e.target.closest('[data-a],[data-t]');if(!b)return;const{a,t,k,i}=b.dataset;
- if(t)tab=t;
+document.addEventListener('click',e=>{
+ if(e.target.id=='go'){const ti=$('title');ti.classList.add('out');setTimeout(()=>ti.remove(),700);TS=Date.now();return}
+ const op=!!e.target.closest('#crest')&&!$('fan').classList.contains('open');
+ $('fan').classList.toggle('open',op);$('crest').classList.toggle('open',op);
+ const b=e.target.closest('[data-a],[data-t]');if(!b)return;const{a,t,k,i}=b.dataset;
+ if(t){tab=t;$('main').scrollTop=0}
  else if(a=='train')addTp(click());
  else if(a=='focus')focus();
  else if(a=='stat'){const c=cost(S.s[k]);if(S.tp>=c){S.tp-=c;S.s[k]++}}
@@ -153,7 +263,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a],[data-t
  else if(a=='awaken')awaken();
  else if(a=='eq'){const n=+k,x=S.eq.indexOf(n);if(x>=0)S.eq.splice(x,1);else if(S.eq.length<3)S.eq.push(n)}
  else if(a=='save'){save();lg('Game saved.')}
- else if(a=='reset'&&confirm('Erase all progress?')){localStorage.removeItem(SAVE);S=fresh();C=null;combo=0;L=[]}
+ else if(a=='export'){const j=JSON.stringify(S);if(navigator.clipboard)navigator.clipboard.writeText(j).then(()=>lg('Save copied to clipboard.'),()=>prompt('Copy your save:',j));else prompt('Copy your save:',j)}
+ else if(a=='import'){const j=prompt('Paste your save');if(j)try{S={...fresh(),...JSON.parse(j)};save();C=null;lg('Save loaded.')}catch(x){lg('That save could not be read.')}}
+ else if(a=='reset'&&confirm('Erase all progress?')){localStorage.removeItem(SAVE);S=fresh();C=null;combo=0;L=[];RL=null}
  render()});
 addEventListener('beforeunload',save);
 
@@ -165,7 +277,9 @@ setInterval(()=>{const n=Date.now(),dt=(n-lt)/1000;lt=n;addTp(auto()*dt);
  if(n-sv>10000){sv=n;save()}
  render()},200);
 
-/* ===== OFFLINE PROGRESS (50% rate, max 8h) ===== */
+/* ===== BOOT ===== */
+buildNav();
+$('go').textContent=S.rec.tp>0?'Continue':'Begin';
 const off=Math.min((Date.now()-S.t)/1000,28800);
 if(off>60&&auto()>0){const g=auto()*off*.5;addTp(g);lg(`Away for ${Math.round(off/60)} min: +${f(g)} TP`)}
 render();
